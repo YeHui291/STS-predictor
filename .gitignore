@@ -28,3 +28,12 @@ poa_*_results/
 #系统
 .DS_Store
 Thumbs.db
+
+# ============================================================
+# 例外: Streamlit Cloud 部署必须提交的模型与数据 (规则在后, 优先生效)
+# ============================================================
+!poa_ngboost_results/
+!poa_ngboost_results/*.pkl
+!data/
+!data/*.xlsx
+

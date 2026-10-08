@@ -20,7 +20,7 @@ if APP_DIR not in sys.path:
     sys.path.insert(0, APP_DIR)
 
 from sts_predictor.config import load_config
-from sts_predictor.core import get_predictor, WORKSPACE
+from sts_predictor.core import get_predictor, find_train_data, DEPLOY_ROOT
 
 cfg = load_config()
 APP = cfg["app"]
@@ -101,7 +101,11 @@ def load_model():
 
 @st.cache_data(show_spinner=False)
 def train_target():
-    df = pd.read_excel(os.path.join(WORKSPACE, "STS数据集重新插补.xlsx"))
+    """加载训练目标用于强度分位; 部署包缺数据时返回空数组, UI 自动隐藏该指标"""
+    path = find_train_data()
+    if not path:
+        return np.array([], dtype=float)
+    df = pd.read_excel(path)
     return df[MODEL_CFG["target"]].dropna().to_numpy(dtype=float)
 
 
@@ -216,7 +220,10 @@ elif page == "Single-point Prediction":
             k1.metric("Predicted STS", f"{pred:.3f} MPa", f"{pred*1000:.1f} kPa")
             k2.metric("95% CI Lower", f"{lo:.3f} MPa")
             k3.metric("95% CI Upper", f"{hi:.3f} MPa")
-            k4.metric("Training Percentile", f"{pct:.0f}%")
+            if y_train.size > 0:
+                k4.metric("Training Percentile", f"{pct:.0f}%")
+            else:
+                k4.metric("Training Percentile", "N/A")
             st.caption("CI from NGBoost predictive distribution (log1p-space 95% interval inverse-transformed via expm1); "
                        "percentile is the relative position of this prediction among the 458 training STS samples.")
 
@@ -325,7 +332,11 @@ elif page == "Model Info":
     st.write(f"**Target variable**: {MODEL_CFG['target']}")
     st.write(f"**Target transform**: {MODEL_CFG['target_transform']}")
     st.write(f"**Data split**: {MODEL_CFG['split']}")
-    st.write(f"**Model file**: `{os.path.relpath(predictor.pkl_path, WORKSPACE)}`")
+    try:
+        model_rel = os.path.relpath(predictor.pkl_path, DEPLOY_ROOT)
+    except ValueError:
+        model_rel = predictor.pkl_path
+    st.write(f"**Model file**: `{model_rel}`")
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="card">', unsafe_allow_html=True)
