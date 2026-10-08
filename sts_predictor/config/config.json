@@ -1,0 +1,39 @@
+{
+    "app": {
+        "title": "Cemented Tailings Backfill Splitting Tensile Strength Intelligent Prediction System V1.0.0",
+        "subtitle": "POA-NGBoost Driven CTB Splitting Tensile Strength Prediction with Uncertainty Quantification",
+        "page_icon": "🧪",
+        "version": "v1.0.0"
+    },
+    "model": {
+        "name": "POA-NGB",
+        "full_name": "Pelican Optimization Algorithm (POA) tuned NGBoost probabilistic regression",
+        "pkl_glob": "poa_ngboost_results/*.pkl",
+        "target": "STS(MPa)",
+        "target_transform": "log1p (inverse via expm1 after prediction)",
+        "train_samples": 366,
+        "test_samples": 92,
+        "external_samples": 48,
+        "split": "Stratified by log1p(STS) deciles, test_size=0.2, random_state=42",
+        "metrics": {
+            "train":    {"R2": 0.9393, "RMSE_kPa": 188.2, "MAE_kPa": 58.7},
+            "test":     {"R2": 0.8907, "RMSE_kPa": 211.0, "MAE_kPa": 89.3},
+            "external": {"R2": 0.8571, "RMSE_kPa": 23.3,  "MAE_kPa": 16.1}
+        }
+    },
+    "features": [
+        {"key": "D10(μm)",   "label": "D10 effective size",      "unit": "um",  "min": 0.5,  "max": 26.034, "default": 3.02,  "step": 0.01,  "help": "Effective particle size d10 of tailings gradation"},
+        {"key": "Cu",        "label": "Cu curvature coeff.",     "unit": "",    "min": 4.65, "max": 36.68,  "default": 9.88,  "step": 0.01,  "help": "Coefficient of uniformity of gradation"},
+        {"key": "Cc",        "label": "Cc uniformity coeff.",    "unit": "",    "min": 0.9,  "max": 2.04,   "default": 1.185, "step": 0.01,  "help": "Coefficient of curvature of gradation"},
+        {"key": "CaO(%)",    "label": "CaO content",             "unit": "%",   "min": 1.12, "max": 59.09,  "default": 14.374,"step": 0.01,  "help": "Calcium oxide mass fraction of binder"},
+        {"key": "Al2O3 (%)", "label": "Al2O3 content",           "unit": "%",   "min": 0.37, "max": 25.04,  "default": 5.183, "step": 0.01,  "help": "Aluminum oxide mass fraction of binder"},
+        {"key": "MgO(%)",    "label": "MgO content",             "unit": "%",   "min": 0.53, "max": 32.71,  "default": 3.166, "step": 0.01,  "help": "Magnesium oxide mass fraction of binder"},
+        {"key": "TEMP(℃)",   "label": "Curing temperature",      "unit": "C",   "min": 0.0,  "max": 80.0,   "default": 20.0,  "step": 1.0,   "help": "Curing environment temperature"},
+        {"key": "CT",        "label": "Cement grade",           "unit": "",    "min": 32.5, "max": 42.5,   "default": 42.5,  "step": 0.0,   "options": [32.5, 42.5], "help": "Cement strength grade (P.O 32.5 / 42.5)"},
+        {"key": "CTR",       "label": "Cement-tailings ratio",   "unit": "",    "min": 0.03, "max": 0.333,  "default": 0.14,  "step": 0.005, "help": "Binder to tailings mass ratio"},
+        {"key": "D(mm)",     "label": "Specimen diameter D",    "unit": "mm",  "min": 50.0, "max": 76.2,   "default": 50.0,  "step": 0.1,   "help": "Splitting specimen diameter"},
+        {"key": "H(mm)",     "label": "Specimen height H",       "unit": "mm",  "min": 20.0, "max": 100.0,  "default": 50.0,  "step": 1.0,   "help": "Splitting specimen height"},
+        {"key": "Cw(%)",     "label": "Slurry mass concentration Cw", "unit": "%", "min": 60.0, "max": 88.17, "default": 73.0, "step": 0.1,  "help": "Solid mass concentration of backfill slurry"},
+        {"key": "T(d)",      "label": "Curing age T",            "unit": "d",   "min": 2.0,  "max": 45.0,   "default": 28.0,  "step": 1.0,   "help": "Standard curing time in days"}
+    ]
+}
